@@ -1,0 +1,65 @@
+虚拟化主要厂商 VMware  Microsoft  redhat citrix oracle  
+
+虚拟机的组成
+kvm 是linux内核的模块,它需要cpu的支持,采用硬件辅助的虚拟化技术,Intel-VT,AMD-V,内存的相关Intel的EPT和ADM的RVI技术
+qemu 是虚拟化的仿真工具,通过ioctl与内核kvm交互完成对硬件的虚拟化支持
+libvirt 是一个对虚拟化管理的接口和工具,提供用户端程序 virsh,virt-install,virt-manager,virt-view 与用户交互
+
+必备软件
+qemu-kvm  为kvm提供底层仿真支持
+libvirt-daemon  守护进程,管理虚拟机
+libvirt-client   用户端软件,提供客户端管理命令
+libvirt-daemon-driver-qemu  libvirtd连接qemu的驱动
+
+可选功能软件包
+virt-install  系统安装工具
+virt-manager  图形管理工具
+virt-v2v    虚拟机迁移工具
+virt-p2v    物理机迁移工具
+
+/etc libvirt/qemu   xml文件,虚拟机配置声明文件
+/var/lib/libvirt/imagers/ 磁盘镜像文件,虚拟机的硬盘
+
+virsh支持交互式 
+
+virsh 虚拟机管理
+list  [--all]  列出虚拟机
+start|shutdown|reboot 虚拟机启动,停止,重启
+destroy  强制停止虚拟机
+define|undefine 根据xml文件 创建/删除 虚拟机
+console 连接虚拟机的console
+
+edit 修改虚拟机的配置
+autostart  设置虚拟机自启动
+domiflist  查看虚拟机网卡信息
+domblklist  查看虚拟机硬盘
+
+
+virsh 虚拟网络管理
+net-list [--all]  列出虚拟网络
+net-start 启动虚拟交换机
+net-destroy 强制停止虚拟交换机
+net-define  根据xml文件 创建虚拟网络
+net-undefine 删除一个虚拟网络设备
+net-edit 修改虚拟交换机的配置
+net-autostart 设置虚拟交换机自启动
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
