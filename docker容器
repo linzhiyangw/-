@@ -127,7 +127,7 @@ curl http://192.168.1.32:5000/v2/_catalog 查看私有镜像仓库的镜像名�
 
 curl http://192.168.1.32:5000/v2/busybox/tags/list  查看仓库的标签
 
-
+持久化存储
 docker run -v /mnt:/usr/share/nginx/html/ -itd docker.io/nginx主机卷映射  
 
 nginx -h   nginx -T   可以查看到原始配置文件
