@@ -1,0 +1,187 @@
+
+docker  只是容器管理系统中的其中一种
+容器靠6大命名空间  主机名 网络 文件系统 信号项链 
+什么是docker: 是完整的一套容器管理系统,提供了一组命令,让用户更加方便直接地使用容器技术,而不需要过多关心底层内核技术
+
+容器技术核心有以下几个内核技术组成:
+
+cgroups 资源管理
+namespace 进程隔离
+selinux安全
+
+优点:相比于传统的虚拟化技术,容器更加简洁高效,传统虚拟机需要给每个Vm安装操作系统,docker不需要,容器使用的共享公共库和程序
+
+缺点:容器的隔离性没有虚拟化强,共用linux内核,安全性有先天的缺陷,selinux难以驾驭,监控容器和容器排错是挑战
+
+安装前准备 : 需要64位操作系统,RHEL7版本 至少6.5 ,关闭防火墙
+
+安装docker
+
+docker images  查看可用镜像
+docker官方提供公共镜像的仓库 https://hub.docker.com
+
+docker search nginx  搜索镜像 前提网络正常通讯
+docker search mysql
+docker search centos
+docker search busybox
+
+docker pull docker.io/busybox 下载镜像
+
+docker help pull 从镜像仓库下载镜像
+
+docker help push  上传镜像到仓库
+
+docker save docker.io(镜像名称)/busybox:latest(标签) -o(输出)  busybox.tar(定义名称)   备份镜像(导出镜像)
+
+docker load -i busybox.tar  导入镜像
+
+
+nginx.tar redis.tar centos.tar ubuntu.tar
+
+[root@docker01 docker]# docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+docker.io/busybox   latest              db8ee88ad75f        2 weeks ago         1.224 MB
+docker.io/redis     latest              82629e941a38        6 months ago        94.98 MB
+docker.io/nginx     latest              42b4762643dc        6 months ago        109.2 MB
+docker.io/ubuntu    latest              20bb25d32758        6 months ago        87.47 MB
+docker.io/centos    latest              76d6bc25b8a5        10 months ago       199.7 MB
+
+docker run -it(d后台运行) docker.io/centos:latest /bin/bash(解释器)  启动镜像(生成容器)
+
+打开另一个终端   docker ps -a(可选 列出所有)  列出正在运行中的容器
+                        -q(显示容器id)
+                        -aq(显示所有容器id)
+dpkg --- rpm 
+dpkg -l --- rpm -qa 
+dpkg -L passwd  rpm -ql
+apt-get --yum 
+ 
+docker history docker.io/centos  查看的镜像制作历史
+
+docker inspect docker.io/cento 查看镜像底层信息
+
+docker tag docker.io/centos  ooxx:latest  修改镜像名称和标签复制(原镜像还在会生成一个ooxx:latest)
+
+docker search  搜索镜像
+
+docker rmi ooxx 删除本地镜像(启动容器时删除镜像会提示错误,先stop,删容器再删镜像)
+
+docker  stop fd5dd4189559  关闭容器
+
+docker  start fd5dd4189559  开启容器
+
+docker  restart fd5dd4189559  重启容器
+
+docker rm $(docker stop 3f14453da58d)  技巧关闭在删除容器(删除容器先关闭)
+
+docker attach  2986b3244e82a775f62ac9a14e929d6f0d478339cc98c45b9d5de2a9eb61c261  进入容器  attach进入容器,exit会导致容器关闭  进入上帝进程 退出上帝进程关闭 容器就会被关闭  离开不关闭上帝进程 ctrl+p+q 
+
+docker exec 0b01459e380c  /bin/bash   进入容器,退出时不会关闭容器 连接在上帝进程开启子进程 退出不会关闭容器
+
+net-tools vim  lftp psmisc bash-completion
+
+docker top  2ea5aa5c11bf(运行中的id号) 查看容器进程列表
+
+自定义镜像:使用镜像启动容器,在该容基础上修改,另存为一个新的镜像
+docker run -it docker.io/centos  修改(增删改数据,安装软件,修改配置文件等)
+
+docker commit 6240c33693f4 docker.io/myos:latest(新镜像名称和标签)
+
+
+Dockerfile  自定义镜像
+
+vim Dockerfile
+
+FROM docker.io/myos:latest
+RUN yum -y install httpd
+WORKDIR /var/www/html
+ADD index.html /var/www/html
+EXPOSE 80
+CMD ["/usr/sbin/httpd","-DFOREGROUND"]
+
+docker build -t myso:latest(新镜像名称和标签)  Dockerfile所在路径
+cat /usr/lib/systemd/system/httpd.service  查看http启动命令
+
+
+自定义镜像仓库   
+服务端装包  docker-distribution.x86_64  起服务
+
+vim /etc/sysconfig/docker  修改配置文件
+
+13 ADD_REGISTRY='--add-registry 192.168.1.32:5000'
+
+24  INSECURE_REGISTRY='--insecure-registry docker02:5000'
+
+重启服务
+
+docker tag docker.io/busybox:latest 192.168.1.32:5000/busybox:latest 为镜像创建标签
+
+docker push 192.168.1.32:5000/busybox:latest  上传镜像文件到私有仓库
+
+客户端也需要修改配置文件 /etc/sysconfig/docker 同上
+
+docker run -it busybox:latest  下载镜像
+
+curl http://192.168.1.32:5000/v2/_catalog 查看私有镜像仓库的镜像名称
+{"repositories":[]}
+
+curl http://192.168.1.32:5000/v2/busybox/tags/list  查看仓库的标签
+
+
+docker run -v /mnt:/usr/share/nginx/html/ -itd docker.io/nginx主机卷映射  
+
+nginx -h   nginx -T 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
